@@ -75,51 +75,6 @@ func test_blake{
     assert hs[1].x = hs2.x;
     assert hs[1].y = hs2.y;
 
-    %{
-        import sys
-        sys.path.insert(1, './python_bulletproofs')
-        sys.path.insert(1, './python_bulletproofs/src')
-
-        import os
-        from random import randint
-        from fastecdsa.curve import secp256k1, Curve
-
-        from group import EC
-        from innerproduct.inner_product_prover import NIProver, FastNIProver2
-        from innerproduct.inner_product_verifier import SUPERCURVE, Verifier1, Verifier2
-        from utils.commitments import vector_commitment
-        from utils.utils import ModP, mod_hash, inner_product, set_ec_points
-        from utils.elliptic_curve_hash import elliptic_hash
-
-        seeds = [b"a" for _ in range(6)]
-        CURVE = SUPERCURVE
-
-        p = SUPERCURVE.q
-        N = 2 ** 1
-        g = 1234
-        h = 345
-        u = 3542
-    %}
-
-    // Load the vector commitments and proof
-    %{
-        a = 8
-        b = 3
-        P = 12
-    %}
-
-    %{
-        # Create and set the proof
-        Prov = FastNIProver2(g, h, u, P, a, b, CURVE, prime=p)
-        proof = Prov.prove() 
-        # Convert the proof into a cairo format
-        proof.convert_to_cairo(ids, memory, segments, len(g))
-
-        Verif = Verifier2(g, h, u, P, proof, prime=p)
-        # For print out purposes
-        Verif.verify()
-    %}
-
     proof_innerprod_2.a = 1;
     proof_innerprod_2.b = 234;
     proof_innerprod_2.n = 1;
