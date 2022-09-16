@@ -1,0 +1,1 @@
+PROOF_VAR_NAME = "proof"

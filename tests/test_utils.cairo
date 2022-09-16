@@ -3,9 +3,9 @@ from starkware.cairo.common.alloc import alloc
 from starkware.cairo.common.cairo_builtins import BitwiseBuiltin
 from src.byte_utils import felts_to_32_bit_word
 
-func test_felts_to_32{range_check_ptr: felt, bitwise_ptr: BitwiseBuiltin*}(n: felt):
-    alloc_locals
-    local l: felt*
+func test_felts_to_32{range_check_ptr: felt, bitwise_ptr: BitwiseBuiltin*}(n: felt) {
+    alloc_locals;
+    local l: felt*;
     %{
         import random
         random.seed(4132)
@@ -16,7 +16,7 @@ func test_felts_to_32{range_check_ptr: felt, bitwise_ptr: BitwiseBuiltin*}(n: fe
             memory[l + i] = r
             ls_py.append(r)
     %}
-    let (words: felt*) = felts_to_32_bit_word(l, n) 
+    let (words: felt*) = felts_to_32_bit_word(l, n);
     %{
         bs = bytes([])
         for e in ls_py:
@@ -26,14 +26,13 @@ func test_felts_to_32{range_check_ptr: felt, bitwise_ptr: BitwiseBuiltin*}(n: fe
             py_word = int.from_bytes(bs[i*4:(i+1)*4], 'little')
             assert py_word == memory[words + i]
     %}
-    
-    return()
-end
 
+    return ();
+}
 
-func main{range_check_ptr: felt, bitwise_ptr: BitwiseBuiltin*}():
-    alloc_locals
-    
-    test_felts_to_32(6)
-    return()
-end
+func main{range_check_ptr: felt, bitwise_ptr: BitwiseBuiltin*}() {
+    alloc_locals;
+
+    test_felts_to_32(6);
+    return ();
+}

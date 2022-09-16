@@ -1,0 +1,23 @@
+language: python
+matrix:
+    include:
+        - python: 3.6
+          dist: trusty
+          sudo: false
+        - python: 3.7
+          dist: xenial
+          sudo: true
+before_install:
+  - sudo apt-get install python-dev libgmp3-dev
+  - wget https://github.com/AntonKueltz/fastecdsa/archive/master.zip
+  - unzip master.zip
+  - cd fastecdsa-master && python setup.py install
+  - cd ..
+
+install:
+  - pip install -r requirements.txt
+
+script: coverage run --source=src -m unittest
+
+after_success:
+  - codecov

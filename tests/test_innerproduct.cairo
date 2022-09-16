@@ -9,17 +9,19 @@ from src.structs import Transcript
 from src.structs import TranscriptEntry
 from src.structs import ProofInnerproduct2
 
-# Return 1 if the proof is verified, otherwise return 0
-func _test_with_i_rounds{range_check_ptr, bitwise_ptr: BitwiseBuiltin*, ec_op_ptr: EcOpBuiltin*, blake2s_ptr: felt*}(i_rounds:felt):
-    alloc_locals
+// Return 1 if the proof is verified, otherwise return 0
+func _test_with_i_rounds{
+    range_check_ptr, bitwise_ptr: BitwiseBuiltin*, ec_op_ptr: EcOpBuiltin*, blake2s_ptr: felt*
+}(i_rounds: felt) {
+    alloc_locals;
 
-    local transcript: Transcript*
-    local proof_innerprod_2: ProofInnerproduct2
-    local transcript_entries: TranscriptEntry*
-    local gs: EcPoint*
-    local hs: EcPoint*
-    local u: EcPoint*
-    local P: EcPoint*
+    local transcript: Transcript*;
+    local proof_innerprod_2: ProofInnerproduct2;
+    local transcript_entries: TranscriptEntry*;
+    local gs: EcPoint*;
+    local hs: EcPoint*;
+    local u: EcPoint*;
+    local P: EcPoint*;
 
     %{
         import sys
@@ -59,7 +61,7 @@ func _test_with_i_rounds{range_check_ptr, bitwise_ptr: BitwiseBuiltin*, ec_op_pt
         set_ec_points(ids, segments, memory, "hs", h)
     %}
 
-    # Load the vector commitments and proof
+    // Load the vector commitments and proof
     %{
         a = [mod_hash(str(i).encode() + seeds[3], p) for i in range(N)]
         b = [mod_hash(str(i).encode() + seeds[4], p) for i in range(N)]
@@ -77,28 +79,26 @@ func _test_with_i_rounds{range_check_ptr, bitwise_ptr: BitwiseBuiltin*, ec_op_pt
         Verif = Verifier2(g, h, u, P, proof, prime=p)
         # For print out purposes
         Verif.verify()
-
     %}
 
-    let (res: felt) = verify_innerproduct_2(gs, hs, u[0], P[0], proof_innerprod_2, transcript)
-    assert res = 1
+    let (res: felt) = verify_innerproduct_2(gs, hs, u[0], P[0], proof_innerprod_2, transcript);
+    assert res = 1;
 
+    return ();
+}
 
-    return ()
-end
+func main{range_check_ptr, bitwise_ptr: BitwiseBuiltin*, ec_op_ptr: EcOpBuiltin*}() {
+    alloc_locals;
+    let (local blake2s_ptr_start) = alloc();
+    let blake2s_ptr = blake2s_ptr_start;
 
-func main{range_check_ptr, bitwise_ptr: BitwiseBuiltin*, ec_op_ptr: EcOpBuiltin*}():
-    alloc_locals
-    let (local blake2s_ptr_start) = alloc()
-    let blake2s_ptr = blake2s_ptr_start
+    _test_with_i_rounds{blake2s_ptr=blake2s_ptr}(0);
+    _test_with_i_rounds{blake2s_ptr=blake2s_ptr}(1);
+    _test_with_i_rounds{blake2s_ptr=blake2s_ptr}(2);
+    _test_with_i_rounds{blake2s_ptr=blake2s_ptr}(3);
+    _test_with_i_rounds{blake2s_ptr=blake2s_ptr}(4);
+    _test_with_i_rounds{blake2s_ptr=blake2s_ptr}(5);
 
-    _test_with_i_rounds{blake2s_ptr=blake2s_ptr}(0)
-    _test_with_i_rounds{blake2s_ptr=blake2s_ptr}(1)
-    _test_with_i_rounds{blake2s_ptr=blake2s_ptr}(2)
-    _test_with_i_rounds{blake2s_ptr=blake2s_ptr}(3)
-    _test_with_i_rounds{blake2s_ptr=blake2s_ptr}(4)
-    _test_with_i_rounds{blake2s_ptr=blake2s_ptr}(5)
-
-    finalize_blake2s(blake2s_ptr_start=blake2s_ptr_start, blake2s_ptr_end=blake2s_ptr)
-    return ()
-end
+    finalize_blake2s(blake2s_ptr_start=blake2s_ptr_start, blake2s_ptr_end=blake2s_ptr);
+    return ();
+}

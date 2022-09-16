@@ -5,17 +5,16 @@ from starkware.cairo.common.cairo_builtins import BitwiseBuiltin
 from starkware.cairo.common.cairo_blake2s.blake2s import INSTANCE_SIZE, blake2s, finalize_blake2s
 from src.hash import blake2s_hash_felts
 
+func test_run_blake2s_and_finalize{range_check_ptr, bitwise_ptr: BitwiseBuiltin*}() {
+    alloc_locals;
+    let (local blake2s_ptr_start) = alloc();
+    let blake2s_ptr = blake2s_ptr_start;
+    let (felts) = alloc();
 
-func test_run_blake2s_and_finalize{range_check_ptr, bitwise_ptr : BitwiseBuiltin*}():
-    alloc_locals
-    let (local blake2s_ptr_start) = alloc()
-    let blake2s_ptr = blake2s_ptr_start
-    let (felts) = alloc()
-
-    assert [felts] = 123454321
-    assert [felts + 1] = 23454321
-    assert [felts + 2] = 3454321
-    assert [felts + 3] = 454321
+    assert [felts] = 123454321;
+    assert [felts + 1] = 23454321;
+    assert [felts + 2] = 3454321;
+    assert [felts + 3] = 454321;
 
     %{
         import sys
@@ -31,20 +30,16 @@ func test_run_blake2s_and_finalize{range_check_ptr, bitwise_ptr : BitwiseBuiltin
     %}
 
     let (hashed: felt) = blake2s_hash_felts{
-        bitwise_ptr=bitwise_ptr,
-        range_check_ptr=range_check_ptr,
-        blake2s_ptr=blake2s_ptr}(felts, 4)
+        bitwise_ptr=bitwise_ptr, range_check_ptr=range_check_ptr, blake2s_ptr=blake2s_ptr
+    }(felts, 4);
 
-    %{
-        assert(ids.hashed == pythonret.x)
-    %}
+    %{ assert(ids.hashed == pythonret.x) %}
 
+    finalize_blake2s(blake2s_ptr_start=blake2s_ptr_start, blake2s_ptr_end=blake2s_ptr);
+    return ();
+}
 
-    finalize_blake2s(blake2s_ptr_start=blake2s_ptr_start, blake2s_ptr_end=blake2s_ptr)
-    return ()
-end
-
-func main{range_check_ptr, bitwise_ptr: BitwiseBuiltin*}():
-    test_run_blake2s_and_finalize()
-    return()
-end
+func main{range_check_ptr, bitwise_ptr: BitwiseBuiltin*}() {
+    test_run_blake2s_and_finalize();
+    return ();
+}
